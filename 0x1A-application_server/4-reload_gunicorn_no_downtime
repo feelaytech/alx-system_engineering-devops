@@ -2,6 +2,16 @@
 # Reloads Gunicorn in a graceful way.
 # shellcheck disable=SC2009
 
+# SOLUTION 1
+
+# (1)Get info about gunicorn service from systemd service status, (2)look for gunicorn $MAINPID,
+# (3)Find and remove extra chars, then print the MAINPID,
+# (4)then send 'hang up' signal to the main gunicorn process
+# in order to reload gunicorn gracefully.
+service gunicorn status | sed -n 's/.*Main PID: \(.*\)$/\1/g p' | cut -f1 -d' ' | xargs kill -HUP
+
+# SOLUTION 2
+
 # (1)Find all processes, (2)look for gunicorn processes,
 # (3)select and print their PIDs,
 # (4)then send 'hang up' signals to those processes
